@@ -15,7 +15,7 @@ router.get("", async (req, res) => {
   }
 });
 
-router.post("", async (req, res) => {
+router.post("/create", async (req, res) => {
   try {
     const url = req.body.url;
     const { data } = await axios.get(url);
@@ -57,7 +57,7 @@ router.post("", async (req, res) => {
 
     // Check if the url is already present in the database
 
-    const check = await Url.find({ url }).lean().exec();
+    const check = await Url.findOne({ url: req.body.url });
     if (check) {
       return res.status(404).send({ message: "Already available" });
     }
@@ -70,6 +70,26 @@ router.post("", async (req, res) => {
       links,
     });
     return res.send(savedData);
+  } catch (error) {
+    return res.status(500).send(error);
+  }
+});
+
+router.put("/update/:id", async (req, res) => {
+  try {
+    const data = await Url.findByIdAndUpdate(req.params.id, req.body, {
+      new: true,
+    });
+    return res.send(data);
+  } catch (error) {
+    return res.status(500).send(error);
+  }
+});
+
+router.delete("/remove/:id", async (req, res) => {
+  try {
+    const deletedData = await Url.findByIdAndDelete(req.params.id);
+    return res.status(200).send({ message: "Deleted", deletedData });
   } catch (error) {
     return res.status(500).send(error);
   }
