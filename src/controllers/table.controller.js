@@ -18,6 +18,9 @@ router.get("", async (req, res) => {
 router.post("/create", async (req, res) => {
   try {
     const url = req.body.url;
+    if (!validUrl.isUri(url)) {
+      return res.status(404).send({ message: "URI is invalid" });
+    }
     const { data } = await axios.get(url);
     const $ = cheerio.load(data);
 
